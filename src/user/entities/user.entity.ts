@@ -6,8 +6,11 @@ export class User {
   id: number;
 
   @Column({ type: 'varchar', length: 20 })
-  username: string;
+  login: string;
 
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar' })
   password: string;
+
+  @Column({ type: 'varchar', length: 30, default: 'user' })
+  role: string;
 }

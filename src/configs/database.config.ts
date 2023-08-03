@@ -9,5 +9,6 @@ export const DatabaseConfig = TypeOrmModule.forRoot({
   username: process.env.USERNAME,
   database: 'nest-vue',
   entities: [User],
+  autoLoadEntities: true,
   synchronize: true,
 });
