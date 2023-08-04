@@ -12,7 +12,7 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
   ) {}
 
-  async create(newUser: CreateUserDto) {
+  async signUp(newUser: CreateUserDto) {
     const salt = 10;
     const hashedPassword = await bcrypt.hash(newUser.password, salt);
     newUser.password = hashedPassword;
@@ -26,10 +26,10 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  async findUser(login: string): Promise<User> {
-    const user = await this.userRepository.findOneBy({ login: login });
+  async findUser(username: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({ username: username });
     if (!user)
-      throw new NotFoundException(`User with login = ${login} not found`);
+      throw new NotFoundException(`User with username = ${username} not found`);
     return user;
   }
 

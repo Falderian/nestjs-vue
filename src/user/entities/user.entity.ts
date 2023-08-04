@@ -6,7 +6,7 @@ export class User {
   id: number;
 
   @Column({ type: 'varchar', length: 20 })
-  login: string;
+  username: string;
 
   @Column({ type: 'varchar' })
   password: string;
