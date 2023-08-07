@@ -1,5 +1,6 @@
 import { User } from 'src/user/entities/user.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { IUserWithoutPass } from 'src/user/types/user.types';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Card {
@@ -12,6 +13,9 @@ export class Card {
   @Column({ type: 'varchar' })
   content: string;
 
-  @OneToMany(() => User, (user) => user.cards)
-  user: User;
+  @ManyToOne(() => User, (user) => user.cards, {
+    nullable: false,
+    cascade: true,
+  })
+  user: IUserWithoutPass;
 }

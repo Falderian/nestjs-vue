@@ -5,8 +5,8 @@ export class CreateCardDto {
   title: string;
 
   @IsNotEmpty()
-  description: string;
+  content: string;
 
   @IsNotEmpty()
-  user: string;
+  userid: string;
 }

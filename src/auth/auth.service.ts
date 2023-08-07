@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotAcceptableException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
@@ -37,6 +38,10 @@ export class AuthService {
 
   async login(user: CreateUserDto): Promise<IAuthorizedUser> {
     const findedUser = await this.validateUser(user.username, user.password);
+    if (!findedUser)
+      throw new NotFoundException(
+        `User with login = ${user.username} not found`,
+      );
     const payload = { username: user.username, sub: user.password };
     return {
       userId: findedUser.id,
