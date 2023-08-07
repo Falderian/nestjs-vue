@@ -1,5 +1,11 @@
 import { Card } from 'src/cards/entities/card.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
@@ -15,6 +21,9 @@ export class User {
   @Column({ type: 'varchar', length: 30, default: 'user' })
   role: string;
 
-  @OneToMany(() => Card, (card) => card.user, { nullable: true })
-  cards: Card[];
+  @OneToMany(() => Card, (card) => card.user, {
+    nullable: false,
+  })
+  @JoinColumn({ name: 'cards' })
+  cards: Card[] | [];
 }
