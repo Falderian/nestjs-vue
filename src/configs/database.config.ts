@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { Card } from 'src/cards/entities/card.entity';
 
 export const DatabaseConfig = TypeOrmModule.forRoot({
   type: 'postgres',
@@ -9,7 +10,7 @@ export const DatabaseConfig = TypeOrmModule.forRoot({
   password: process.env.PASSWORD,
   username: process.env.USER,
   database: 'nest-vue',
-  entities: [User],
+  entities: [User, Card],
   autoLoadEntities: true,
   synchronize: true,
 });

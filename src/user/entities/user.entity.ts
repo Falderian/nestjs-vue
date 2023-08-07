@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Card } from 'src/cards/entities/card.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -13,4 +14,7 @@ export class User {
 
   @Column({ type: 'varchar', length: 30, default: 'user' })
   role: string;
+
+  @OneToMany(() => Card, (card) => card.user, { nullable: true })
+  cards: Card[];
 }
