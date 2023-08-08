@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { CardsController } from './cards.controller';
-import { UserModule } from 'src/user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { AuthModule } from 'src/auth/auth.module';
+import { User } from '../user/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { Card } from './entities/card.entity';
+import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [UserModule, TypeOrmModule.forFeature([User, Card])],

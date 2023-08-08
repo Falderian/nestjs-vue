@@ -1,7 +1,6 @@
-import { User } from 'src/user/entities/user.entity';
-import { IUserWithoutPass } from 'src/user/types/user.types';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-
+import { IUserWithoutPass } from '../../user/types/user.types';
+import { User } from '../../user/entities/user.entity';
 @Entity()
 export class Card {
   @PrimaryGeneratedColumn()

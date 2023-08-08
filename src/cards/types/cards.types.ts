@@ -1,4 +1,4 @@
-import { IUserWithoutPass } from 'src/user/types/user.types';
+import { IUserWithoutPass } from '../../user/types/user.types';
 
 export interface ICardWithUser {
   title: string;

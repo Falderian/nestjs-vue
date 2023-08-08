@@ -5,11 +5,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { IAuthorizedUser } from './types/auth.types';
+import { UserService } from '../user/user.service';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,16 +20,12 @@ export class AuthService {
 
   async validateUser(username: string, password: string): Promise<User> {
     const user = await this.userService.findUser(username);
-    if (!user)
-      throw new ConflictException(
-        `User with login = ${username} already exists`,
-      );
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!user) {
       throw new NotAcceptableException('could not find the user');
     }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (user && isPasswordValid) {
       return user;
     }
