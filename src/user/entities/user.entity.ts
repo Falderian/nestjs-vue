@@ -1,4 +1,5 @@
 import { Card } from '../../cards/entities/card.entity';
+import { Dashboard } from '../../dashboards/entities/dashboard.entity';
 import {
   Column,
   Entity,
@@ -21,9 +22,7 @@ export class User {
   @Column({ type: 'varchar', length: 30, default: 'user' })
   role: string;
 
-  @OneToMany(() => Card, (card) => card.user, {
-    nullable: false,
-  })
-  @JoinColumn({ name: 'cards' })
-  cards: Card[] | [];
+  @OneToMany(() => Dashboard, (dashboard) => dashboard.user)
+  @JoinColumn({ name: 'dashboards' })
+  dashboards: Dashboard[];
 }

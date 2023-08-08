@@ -1,7 +1,7 @@
-import { Card } from '../../cards/entities/card.entity';
+import { Dashboard } from '../../dashboards/entities/dashboard.entity';
 export interface IUserWithoutPass {
   username: string;
   id: number;
   role: string;
-  cards: Card[];
+  dashboards: Dashboard[];
 }

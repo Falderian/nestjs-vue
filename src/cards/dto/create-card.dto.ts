@@ -8,5 +8,8 @@ export class CreateCardDto {
   content: string;
 
   @IsNotEmpty()
-  userid: string;
+  userId: string;
+
+  @IsNotEmpty()
+  dashboardId: string;
 }

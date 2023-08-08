@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { IUserWithoutPass } from '../../user/types/user.types';
 import { User } from '../../user/entities/user.entity';
+import { Dashboard } from 'src/dashboards/entities/dashboard.entity';
 @Entity()
 export class Card {
   @PrimaryGeneratedColumn()
@@ -12,9 +13,9 @@ export class Card {
   @Column({ type: 'varchar' })
   content: string;
 
-  @ManyToOne(() => User, (user) => user.cards, {
+  @ManyToOne(() => Dashboard, (dashboard) => dashboard.cards, {
     nullable: false,
     cascade: true,
   })
-  user: IUserWithoutPass;
+  dashboard: Dashboard;
 }
