@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,27 +14,30 @@ export class CardsService {
     @InjectRepository(Card) private cardsRepository: Repository<Card>,
     @InjectRepository(Dashboard)
     private dashboardsRepository: Repository<Dashboard>,
-    private readonly userService: UserService,
   ) {}
 
   async create(createCardDto: CreateCardDto) {
     const dashboard = await this.dashboardsRepository.findOneOrFail({
       relations: ['cards'],
-      where: { id: +createCardDto.userId },
+      where: { id: +createCardDto.dashboardId },
     });
-    return dashboard;
-    //   const user = await this.userService.findUser(createCardDto.userId);
-    //   delete createCardDto.userId;
-    //   delete user.password;
-    // const newCard = await this.cardsRepository.save({ ...createCardDto, user });
-    // return newCard;
-  }
 
-  // async getUserCards(userid: number): Promise<Card[]> {
-  //   const users = await this.usersRepository.findOne({
-  //     relations: ['cards'],
-  //     where: { id: userid },
-  //   });
-  //   return users.cards;
-  // }
+    const isCardAlreadyExists = dashboard.cards.map(
+      (card) => card.title === createCardDto.title,
+    );
+
+    if (isCardAlreadyExists)
+      throw new ConflictException(
+        `Card with title = ${createCardDto.title} is already exists on dashboard with title = ${dashboard.title}`,
+      );
+
+    const newCard = await this.cardsRepository.save({
+      ...createCardDto,
+      dashboard,
+    });
+
+    dashboard[`${createCardDto.status}`].push(newCard.id);
+
+    return newCard;
+  }
 }

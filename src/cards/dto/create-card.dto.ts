@@ -1,4 +1,5 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, Matches, Validate } from 'class-validator';
+import { StatusValidator } from '../validation/status.validation';
 
 export class CreateCardDto {
   @IsNotEmpty()
@@ -7,8 +8,8 @@ export class CreateCardDto {
   @IsNotEmpty()
   content: string;
 
-  @IsNotEmpty()
-  userId: string;
+  @Validate(StatusValidator)
+  status: string;
 
   @IsNotEmpty()
   dashboardId: string;
