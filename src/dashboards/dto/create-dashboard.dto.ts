@@ -1,4 +1,4 @@
-import { IsNotEmpty, MaxLength, Min } from 'class-validator';
+import { IsNotEmpty, Min } from 'class-validator';
 
 export class CreateDashboardDto {
   @IsNotEmpty()

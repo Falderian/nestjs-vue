@@ -10,6 +10,8 @@ import { EntityNotFoundError, Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { Dashboard } from './entities/dashboard.entity';
 import { Card } from 'src/cards/entities/card.entity';
+import { IDashboadCards } from './types/dashboards.types';
+import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 
 @Injectable()
 export class DashboardsService {
@@ -62,7 +64,7 @@ export class DashboardsService {
     return await Promise.all(dashboards);
   }
 
-  async getDashboardsCards(dashboardId: string): Promise<Card[]> {
+  async getDashboardsCards(dashboardId: string): Promise<IDashboadCards> {
     const dashboard = await this.dashboardsRepository.findOne({
       relations: ['cards'],
       where: { id: +dashboardId },
@@ -73,6 +75,29 @@ export class DashboardsService {
         `Dashboard with id = ${dashboardId} not found`,
       );
 
-    return dashboard.cards;
+    const cards: IDashboadCards = {
+      toDo: [],
+      inProgress: [],
+      review: [],
+      completed: [],
+    };
+
+    dashboard.cards.forEach((card) => cards[card.status].push(card));
+
+    return cards;
+  }
+
+  async update(dashboard: UpdateDashboardDto) {
+    const updatedDashboard = await this.dashboardsRepository.update(
+      dashboard.id,
+      dashboard,
+    );
+
+    return updatedDashboard;
+  }
+
+  async delete(dashboardId: string) {
+    const res = this.dashboardsRepository.delete(dashboardId);
+    return res;
   }
 }

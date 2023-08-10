@@ -3,8 +3,8 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Card } from './entities/card.entity';
-import { User } from '../user/entities/user.entity';
 import { Dashboard } from '../dashboards/entities/dashboard.entity';
+import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()
 export class CardsService {
@@ -34,16 +34,34 @@ export class CardsService {
 
     delete createCardDto.dashboardId;
     delete dashboard.user;
-    try {
-      const newCard = await this.cardsRepository.save({
-        ...createCardDto,
-        dashboard,
-      });
 
-      delete newCard.dashboard;
-      return newCard;
-    } catch (error) {
-      console.log(error);
-    }
+    const newCard = await this.cardsRepository.save({
+      ...createCardDto,
+      dashboard,
+    });
+
+    delete newCard.dashboard;
+    return newCard;
+  }
+
+  async find(id: number) {
+    const findedCard = await this.cardsRepository.findOneBy({
+      id,
+    });
+    return findedCard;
+  }
+
+  async update(updateCardDto: UpdateCardDto) {
+    const card = await this.cardsRepository.findOneBy({
+      id: updateCardDto.id,
+    });
+    const newCard = await this.cardsRepository.update(card.id, updateCardDto);
+
+    return newCard;
+  }
+
+  async delete(id: number) {
+    const cardToDelete = await this.cardsRepository.delete(id);
+    return cardToDelete;
   }
 }
