@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
@@ -17,8 +21,8 @@ export class DashboardsService {
   ) {}
 
   async create(dashboard: CreateDashboardDto) {
-    const user = await this.userService.findUser(dashboard.userid);
-    delete dashboard.userid;
+    const user = await this.userService.findUser(dashboard.userId);
+    delete dashboard.userId;
     delete user.password;
 
     const statuses = {
@@ -28,12 +32,19 @@ export class DashboardsService {
       completed: [],
     };
 
-    const newDashboard = await this.dashboardsRepository.save({
-      ...dashboard,
-      ...statuses,
-      user,
-    });
-    return newDashboard;
+    try {
+      const newDashboard = await this.dashboardsRepository.save({
+        ...dashboard,
+        ...statuses,
+        cards: [],
+        user,
+      });
+      return newDashboard;
+    } catch (error) {
+      throw new NotAcceptableException(
+        `Dashboard with title = ${dashboard.title}, is laready exists`,
+      );
+    }
   }
 
   async getUsersDashboards(userId: string) {
@@ -41,8 +52,14 @@ export class DashboardsService {
       relations: ['dashboards'],
       where: { id: +userId },
     });
-
-    return user.dashboards;
+    const dashboards = user.dashboards.map(async (dashboard) => {
+      const dashboardsCards = this.dashboardsRepository.findOne({
+        relations: ['cards'],
+        where: { id: dashboard.id },
+      });
+      return dashboardsCards;
+    });
+    return await Promise.all(dashboards);
   }
 
   async getDashboardsCards(dashboardId: string): Promise<Card[]> {

@@ -3,9 +3,7 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Card } from './entities/card.entity';
-import { ICardWithUser } from './types/cards.types';
 import { User } from '../user/entities/user.entity';
-import { UserService } from '../user/user.service';
 import { Dashboard } from '../dashboards/entities/dashboard.entity';
 
 @Injectable()
@@ -17,12 +15,15 @@ export class CardsService {
   ) {}
 
   async create(createCardDto: CreateCardDto) {
-    const dashboard = await this.dashboardsRepository.findOneOrFail({
-      relations: ['cards'],
-      where: { id: +createCardDto.dashboardId },
+    const dashboard = await this.dashboardsRepository.findOne({
+      relations: ['cards', 'user'],
+      where: {
+        user: { id: +createCardDto.userId },
+        id: +createCardDto.dashboardId,
+      },
     });
 
-    const isCardAlreadyExists = dashboard.cards.map(
+    const isCardAlreadyExists = dashboard.cards.find(
       (card) => card.title === createCardDto.title,
     );
 
@@ -31,13 +32,18 @@ export class CardsService {
         `Card with title = ${createCardDto.title} is already exists on dashboard with title = ${dashboard.title}`,
       );
 
-    const newCard = await this.cardsRepository.save({
-      ...createCardDto,
-      dashboard,
-    });
+    delete createCardDto.dashboardId;
+    delete dashboard.user;
+    try {
+      const newCard = await this.cardsRepository.save({
+        ...createCardDto,
+        dashboard,
+      });
 
-    dashboard[`${createCardDto.status}`].push(newCard.id);
-
-    return newCard;
+      delete newCard.dashboard;
+      return newCard;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

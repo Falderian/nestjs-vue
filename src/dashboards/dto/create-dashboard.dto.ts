@@ -1,10 +1,10 @@
-import { IsNotEmpty, MaxLength } from 'class-validator';
+import { IsNotEmpty, MaxLength, Min } from 'class-validator';
 
 export class CreateDashboardDto {
   @IsNotEmpty()
   title: string;
 
   @IsNotEmpty()
-  @MaxLength(20)
-  userid: string;
+  @Min(1)
+  userId: string;
 }

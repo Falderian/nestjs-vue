@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -22,15 +23,15 @@ export class Dashboard {
   @OneToMany(() => Card, (card) => card.dashboard)
   cards: Card[];
 
-  @Column('int', { array: true, nullable: true })
+  @Column('int', { array: true, nullable: true, default: [] })
   toDo: number[];
 
-  @Column('int', { array: true, nullable: true })
-  inProgress: Card[];
+  @Column('int', { array: true, nullable: true, default: [] })
+  inProgress: number[];
 
-  @Column('int', { array: true, nullable: true })
-  review: Card[];
+  @Column('int', { array: true, nullable: true, default: [] })
+  review: number[];
 
-  @Column('int', { array: true, nullable: true })
-  completed: Card[];
+  @Column('int', { array: true, nullable: true, default: [] })
+  completed: number[];
 }
