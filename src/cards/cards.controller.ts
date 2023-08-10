@@ -13,7 +13,7 @@ import { CreateCardDto } from './dto/create-card.dto';
 import { AuthJwtGuards } from '../auth/guards/auth.guard';
 import { Card } from './entities/card.entity';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { UpdateResult } from 'typeorm';
+import { DeleteResult, UpdateResult } from 'typeorm';
 
 @UseGuards(AuthJwtGuards)
 @Controller('cards')
@@ -36,7 +36,7 @@ export class CardsController {
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string) {
+  delete(@Param('id') id: string): Promise<DeleteResult> {
     return this.cardsService.delete(+id);
   }
 }

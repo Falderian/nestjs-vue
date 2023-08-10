@@ -1,4 +1,4 @@
-import { IsNotEmpty, Matches, Validate } from 'class-validator';
+import { IsNotEmpty, Validate } from 'class-validator';
 import { StatusValidator } from '../validation/status.validation';
 
 export class CreateCardDto {

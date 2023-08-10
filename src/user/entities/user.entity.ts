@@ -1,4 +1,3 @@
-import { Card } from '../../cards/entities/card.entity';
 import { Dashboard } from '../../dashboards/entities/dashboard.entity';
 import {
   Column,

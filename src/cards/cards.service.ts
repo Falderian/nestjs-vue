@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Card } from './entities/card.entity';
 import { Dashboard } from '../dashboards/entities/dashboard.entity';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -14,7 +14,7 @@ export class CardsService {
     private dashboardsRepository: Repository<Dashboard>,
   ) {}
 
-  async create(createCardDto: CreateCardDto) {
+  async create(createCardDto: CreateCardDto): Promise<Card> {
     const dashboard = await this.dashboardsRepository.findOne({
       relations: ['cards', 'user'],
       where: {
@@ -44,14 +44,14 @@ export class CardsService {
     return newCard;
   }
 
-  async find(id: number) {
+  async find(id: number): Promise<Card> {
     const findedCard = await this.cardsRepository.findOneBy({
       id,
     });
     return findedCard;
   }
 
-  async update(updateCardDto: UpdateCardDto) {
+  async update(updateCardDto: UpdateCardDto): Promise<UpdateResult> {
     const card = await this.cardsRepository.findOneBy({
       id: updateCardDto.id,
     });
@@ -60,7 +60,7 @@ export class CardsService {
     return newCard;
   }
 
-  async delete(id: number) {
+  async delete(id: number): Promise<DeleteResult> {
     const cardToDelete = await this.cardsRepository.delete(id);
     return cardToDelete;
   }
