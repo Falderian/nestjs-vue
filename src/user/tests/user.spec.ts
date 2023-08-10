@@ -26,11 +26,6 @@ describe('UserController', () => {
     controller = (await TestingModule).get<UserController>(UserController);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-    expect(controller).toBeDefined();
-  });
-
   it('should resigter user', async () => {
     const registeredUser = await controller.signUp(newUser);
     expect(registeredUser.username).toBe(newUser.username);

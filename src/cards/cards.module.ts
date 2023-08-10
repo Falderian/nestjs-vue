@@ -7,9 +7,15 @@ import { JwtService } from '@nestjs/jwt';
 import { Card } from './entities/card.entity';
 import { AuthModule } from '../auth/auth.module';
 import { UserModule } from '../user/user.module';
+import { DashboardsModule } from '../dashboards/dashboards.module';
+import { Dashboard } from '../dashboards/entities/dashboard.entity';
 
 @Module({
-  imports: [UserModule, TypeOrmModule.forFeature([User, Card])],
+  imports: [
+    UserModule,
+    DashboardsModule,
+    TypeOrmModule.forFeature([User, Card, Dashboard]),
+  ],
   controllers: [CardsController],
   providers: [CardsService, AuthModule, JwtService],
 })

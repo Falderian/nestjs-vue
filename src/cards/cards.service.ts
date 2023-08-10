@@ -1,34 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Card } from './entities/card.entity';
-import { ICardWithUser } from './types/cards.types';
-import { User } from '../user/entities/user.entity';
-import { UserService } from '../user/user.service';
+import { Dashboard } from '../dashboards/entities/dashboard.entity';
+import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()
 export class CardsService {
   constructor(
     @InjectRepository(Card) private cardsRepository: Repository<Card>,
-    @InjectRepository(User) private usersRepository: Repository<User>,
-    private readonly userService: UserService,
+    @InjectRepository(Dashboard)
+    private dashboardsRepository: Repository<Dashboard>,
   ) {}
 
-  async create(createCardDto: CreateCardDto): Promise<ICardWithUser> {
-    const user = await this.userService.findUser(createCardDto.userid);
-    delete createCardDto.userid;
-    delete user.password;
-    const newCard = { ...createCardDto, user };
-    await this.cardsRepository.save(newCard);
+  async create(createCardDto: CreateCardDto) {
+    const dashboard = await this.dashboardsRepository.findOne({
+      relations: ['cards', 'user'],
+      where: {
+        user: { id: +createCardDto.userId },
+        id: +createCardDto.dashboardId,
+      },
+    });
+
+    const isCardAlreadyExists = dashboard.cards.find(
+      (card) => card.title === createCardDto.title,
+    );
+
+    if (isCardAlreadyExists)
+      throw new ConflictException(
+        `Card with title = ${createCardDto.title} is already exists on dashboard with title = ${dashboard.title}`,
+      );
+
+    delete createCardDto.dashboardId;
+    delete dashboard.user;
+
+    const newCard = await this.cardsRepository.save({
+      ...createCardDto,
+      dashboard,
+    });
+
+    delete newCard.dashboard;
     return newCard;
   }
 
-  async getUserCards(userid: number) {
-    const users = await this.usersRepository.findOne({
-      relations: ['cards'],
-      where: { id: userid },
+  async find(id: number) {
+    const findedCard = await this.cardsRepository.findOneBy({
+      id,
     });
-    return users.cards;
+    return findedCard;
+  }
+
+  async update(updateCardDto: UpdateCardDto) {
+    const card = await this.cardsRepository.findOneBy({
+      id: updateCardDto.id,
+    });
+    const newCard = await this.cardsRepository.update(card.id, updateCardDto);
+
+    return newCard;
+  }
+
+  async delete(id: number) {
+    const cardToDelete = await this.cardsRepository.delete(id);
+    return cardToDelete;
   }
 }
