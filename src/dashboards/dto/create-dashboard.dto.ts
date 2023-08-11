@@ -6,5 +6,5 @@ export class CreateDashboardDto {
 
   @IsNotEmpty()
   @Min(1)
-  userId: string;
+  userId: string | number;
 }

@@ -6,7 +6,7 @@ import {
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { Dashboard } from './entities/dashboard.entity';
 import { IDashboadCards } from './types/dashboards.types';
@@ -23,6 +23,7 @@ export class DashboardsService {
 
   async create(dashboard: CreateDashboardDto): Promise<Dashboard> {
     const user = await this.userService.findUser(dashboard.userId);
+
     delete dashboard.userId;
     delete user.password;
 
@@ -86,17 +87,21 @@ export class DashboardsService {
     return cards;
   }
 
-  async update(dashboard: UpdateDashboardDto): Promise<UpdateResult> {
-    const updatedDashboard = await this.dashboardsRepository.update(
-      dashboard.id,
-      dashboard,
-    );
-
+  async update(dashboard: UpdateDashboardDto): Promise<Dashboard> {
+    await this.dashboardsRepository.update(dashboard.id, dashboard);
+    const updatedDashboard = await this.dashboardsRepository.findOneBy({
+      id: dashboard.id,
+    });
     return updatedDashboard;
   }
 
-  async delete(dashboardId: string): Promise<DeleteResult> {
-    const res = this.dashboardsRepository.delete(dashboardId);
-    return res;
+  async delete(dashboardId: number): Promise<string> {
+    await this.dashboardsRepository.delete(dashboardId);
+    return `Dashboard with id = ${dashboardId} has beed deleted`;
+  }
+
+  async find(id: number): Promise<Dashboard> {
+    const dashboard = await this.dashboardsRepository.findOneBy({ id });
+    return dashboard;
   }
 }
