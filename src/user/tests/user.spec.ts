@@ -18,7 +18,7 @@ describe('UserController', () => {
 
   const newUser = {
     username: (Math.random() * 100).toFixed(),
-    password: (Math.random() * 100).toFixed(),
+    password: (Math.random() * 100000).toFixed(),
   };
 
   beforeAll(async () => {
@@ -38,7 +38,10 @@ describe('UserController', () => {
 
   it('should throw error, when user already exists and trying to register', async () => {
     try {
-      await controller.signUp(newUser);
+      await controller.signUp({
+        ...newUser,
+        password: (Math.random() * 100000).toFixed(),
+      });
     } catch (error) {
       expect(error.message).toBe(
         `User with login = ${newUser.username} already exists`,
