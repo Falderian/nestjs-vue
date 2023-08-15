@@ -12,8 +12,8 @@ export class CreateCardDto {
   status: string;
 
   @IsNotEmpty()
-  dashboardId: string;
+  dashboardId: number;
 
   @IsNotEmpty()
-  userId: string;
+  userId: number;
 }

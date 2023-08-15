@@ -14,11 +14,23 @@ import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { IDashboadCards } from './types/dashboards.types';
 import { Dashboard } from './entities/dashboard.entity';
+// import { InjectRepository } from '@nestjs/typeorm';
+// import { Repository } from 'typeorm';
+
+// import { CardsService } from '../cards/cards.service';
+// import { User } from '../user/entities/user.entity';
 
 @UseGuards(AuthJwtGuards)
 @Controller('dashboards')
 export class DashboardsController {
-  constructor(private readonly dashboardsService: DashboardsService) {}
+  constructor(
+    // @InjectRepository(User)
+    // private UserRepository: Repository<User>,
+    // private readonly cardsService: CardsService,
+    // @InjectRepository(Dashboard)
+    // private dashboardsRepository: Repository<Dashboard>,
+    private readonly dashboardsService: DashboardsService,
+  ) {}
 
   @Post()
   create(@Body() dashboard: CreateDashboardDto): Promise<Dashboard> {
@@ -26,7 +38,7 @@ export class DashboardsController {
   }
 
   @Get(':id')
-  getUsersDashboards(@Param('id') userId: string): Promise<Dashboard[]> {
+  getUsersDashboards(@Param('id') userId: number): Promise<Dashboard[]> {
     return this.dashboardsService.getUsersDashboards(userId);
   }
 
@@ -34,7 +46,7 @@ export class DashboardsController {
   getDashboardsCards(
     @Param('id') dashboardId: string,
   ): Promise<IDashboadCards> {
-    return this.dashboardsService.getDashboardsCards(dashboardId);
+    return this.dashboardsService.getDashboardsCards(+dashboardId);
   }
 
   @Put()
@@ -46,4 +58,41 @@ export class DashboardsController {
   delete(@Param('id') id: number): Promise<string> {
     return this.dashboardsService.delete(id);
   }
+
+  // Uncomment to fill DB
+  // @Get()
+  // async fill() {
+  //   for (let i = 0; i <= 50; i++) {
+  //     this.UserRepository.save({
+  //       username: `test${i}`,
+  //       password: 'test',
+  //     });
+  //   }
+  //   const users = await this.UserRepository.find();
+  //   users.forEach(async (user) => {
+  //     for (let i = 0; i <= 10; i++) {
+  //       await this.dashboardsService.create({
+  //         title: (+new Date() * Math.random()).toString(36).substring(0, 9),
+  //         userId: user.id,
+  //       });
+  //     }
+  //   });
+  //   const dashboards = await this.dashboardsRepository.find({
+  //     relations: ['user'],
+  //   });
+  //   const statuses = ['toDo', 'inProgress', 'review', 'completed'];
+  //   dashboards.forEach(async (dashboard) => {
+  //     for (let i = 0; i <= 50; i++) {
+  //       const status = statuses[Math.floor(Math.random() * statuses.length)];
+  //       const card = {
+  //         title: (+new Date() * Math.random()).toString(36).substring(0, 9),
+  //         content: (+new Date() * Math.random()).toString(36).substring(0, 9),
+  //         status: status,
+  //         dashboardId: dashboard.id,
+  //         userId: dashboard.user.id,
+  //       };
+  //       await this.cardsService.create(card);
+  //     }
+  //   });
+  // }
 }

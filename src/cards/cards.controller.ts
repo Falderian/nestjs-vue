@@ -3,17 +3,16 @@ import {
   Post,
   Body,
   UseGuards,
-  Put,
   Get,
   Delete,
   Param,
+  Patch,
 } from '@nestjs/common';
 import { CardsService } from './cards.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { AuthJwtGuards } from '../auth/guards/auth.guard';
 import { Card } from './entities/card.entity';
 import { UpdateCardDto } from './dto/update-card.dto';
-import { DeleteResult, UpdateResult } from 'typeorm';
 
 @UseGuards(AuthJwtGuards)
 @Controller('cards')
@@ -30,13 +29,13 @@ export class CardsController {
     return this.cardsService.find(+id);
   }
 
-  @Put()
-  update(@Body() updateCarDto: UpdateCardDto): Promise<UpdateResult> {
+  @Patch()
+  update(@Body() updateCarDto: UpdateCardDto): Promise<string> {
     return this.cardsService.update(updateCarDto);
   }
 
   @Delete(':id')
-  delete(@Param('id') id: string): Promise<DeleteResult> {
+  delete(@Param('id') id: string): Promise<string> {
     return this.cardsService.delete(+id);
   }
 }

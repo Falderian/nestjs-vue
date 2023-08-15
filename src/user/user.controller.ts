@@ -1,7 +1,19 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Patch,
+  Delete,
+  UseGuards,
+  Param,
+  // Get,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IUserWithoutPass } from './types/user.types';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthJwtGuards } from '../auth/guards/auth.guard';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
@@ -12,13 +24,15 @@ export class UserController {
     return this.userService.signUp(user);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
+  @UseGuards(AuthJwtGuards)
+  @Patch()
+  update(@Body() updateUserDto: UpdateUserDto): Promise<string | object> {
+    return this.userService.update(updateUserDto);
+  }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.userService.remove(+id);
-  // }
+  @UseGuards(AuthJwtGuards)
+  @Delete(':id')
+  remove(@Param('id') id: string): Promise<User> {
+    return this.userService.remove(+id);
+  }
 }
