@@ -5,18 +5,11 @@ import { JWTModule } from '../../configs/jwt.config';
 import { AuthService } from '../../auth/auth.service';
 import { AuthController } from '../../auth/auth.controller';
 import { UserController } from '../../user/user.controller';
-import { DataSource } from 'typeorm';
 import { DashboardsModule } from '../dashboards.module';
 import { DashboardsController } from '../dashboards.controller';
 import { IAuthorizedUser } from '../../../dist/auth/types/auth.types';
 import { Dashboard } from '../entities/dashboard.entity';
-import { User } from '../../user/entities/user.entity';
-
-const TestingModule = Test.createTestingModule({
-  imports: [TestDatabaseConfig, UserModule, JWTModule, DashboardsModule],
-  providers: [AuthService],
-  controllers: [AuthController],
-}).compile();
+import { clearDatabase } from '../../utils/utils';
 
 describe('Dashboard Module', () => {
   let authController: AuthController;
@@ -27,11 +20,17 @@ describe('Dashboard Module', () => {
   let dashboard: Dashboard;
 
   beforeAll(async () => {
-    authController = (await TestingModule).get<AuthController>(AuthController);
-    userController = (await TestingModule).get<UserController>(UserController);
-    dashboardController = (await TestingModule).get<DashboardsController>(
-      DashboardsController,
-    );
+    const TestingModule = await Test.createTestingModule({
+      imports: [TestDatabaseConfig, UserModule, JWTModule, DashboardsModule],
+      providers: [AuthService],
+      controllers: [AuthController],
+    }).compile();
+
+    authController = TestingModule.get<AuthController>(AuthController);
+    userController = TestingModule.get<UserController>(UserController);
+    dashboardController =
+      TestingModule.get<DashboardsController>(DashboardsController);
+    clearDatabase(TestingModule);
   });
 
   it('should register, login user and return an access token', async () => {
@@ -63,13 +62,20 @@ describe('Dashboard Module', () => {
     expect(updatedDashboard.title).toEqual(newDashboard.title);
   });
 
+  it('should return 2 dashboards', async () => {
+    const newDashboard = {
+      title: (Math.random() * 100 ** 5).toString(),
+      userId: loggedUser.userId,
+    };
+    await dashboardController.create(newDashboard);
+    const usersDashboards = await dashboardController.getUsersDashboards(
+      loggedUser.userId,
+    );
+    expect(usersDashboards).toHaveLength(2);
+  });
+
   it('should delete the dashboard', async () => {
     const res = await dashboardController.delete(dashboard.id);
     expect(res).toEqual(`Dashboard with id = ${dashboard.id} has beed deleted`);
-  });
-
-  afterAll(async () => {
-    const dataSource = (await TestingModule).get(DataSource);
-    await dataSource.createQueryBuilder().delete().from(User).execute();
   });
 });

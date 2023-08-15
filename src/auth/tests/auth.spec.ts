@@ -5,14 +5,7 @@ import { AuthController } from '../auth.controller';
 import { UserModule } from '../../user/user.module';
 import { JWTModule } from '../../configs/jwt.config';
 import { UserController } from '../../user/user.controller';
-import { DataSource } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
-
-const TestingModule = Test.createTestingModule({
-  imports: [TestDatabaseConfig, UserModule, JWTModule],
-  providers: [AuthService],
-  controllers: [AuthController],
-}).compile();
+import { clearDatabase } from '../../utils/utils';
 
 describe('AuthController', () => {
   let authService: AuthService;
@@ -20,9 +13,16 @@ describe('AuthController', () => {
   let userController: UserController;
 
   beforeAll(async () => {
-    authService = (await TestingModule).get<AuthService>(AuthService);
-    authController = (await TestingModule).get<AuthController>(AuthController);
-    userController = (await TestingModule).get<UserController>(UserController);
+    const TestingModule = await Test.createTestingModule({
+      imports: [TestDatabaseConfig, UserModule, JWTModule],
+      providers: [AuthService],
+      controllers: [AuthController],
+    }).compile();
+
+    authService = TestingModule.get<AuthService>(AuthService);
+    authController = TestingModule.get<AuthController>(AuthController);
+    userController = TestingModule.get<UserController>(UserController);
+    clearDatabase(TestingModule);
   });
 
   it('should be defined', () => {
@@ -32,8 +32,8 @@ describe('AuthController', () => {
 
   it('should register and login user', async () => {
     const newUser = {
-      username: 'test',
-      password: 'test',
+      username: (Math.random() * 100 ** 5).toString(),
+      password: (Math.random() * 100 ** 5).toString(),
     };
 
     const user = { ...newUser };
@@ -41,10 +41,5 @@ describe('AuthController', () => {
     const registeredUser = await userController.signUp(newUser);
     const loginUser = await authController.login(user);
     expect(registeredUser.id).toEqual(loginUser.userId);
-  });
-
-  afterAll(async () => {
-    const dataSource = (await TestingModule).get(DataSource);
-    await dataSource.createQueryBuilder().delete().from(User).execute();
   });
 });

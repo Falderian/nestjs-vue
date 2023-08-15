@@ -21,7 +21,7 @@ export class User {
   @Column({ type: 'varchar', length: 30, default: 'user' })
   role: string;
 
-  @OneToMany(() => Dashboard, (dashboard) => dashboard.user)
+  @OneToMany(() => Dashboard, (dashboard) => dashboard.user, { cascade: true })
   @JoinColumn({ name: 'dashboards' })
   dashboards: Dashboard[];
 }

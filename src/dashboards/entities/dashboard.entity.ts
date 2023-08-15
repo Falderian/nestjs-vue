@@ -4,6 +4,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
 } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Card } from '../../cards/entities/card.entity';
@@ -19,6 +20,6 @@ export class Dashboard {
   @ManyToOne(() => User, (user) => user.dashboards)
   user: User;
 
-  @OneToMany(() => Card, (card) => card.dashboard)
-  cards: Card[];
+  @OneToMany(() => Card, (card) => card.dashboard, { cascade: true })
+  cards: Relation<Card[]>;
 }

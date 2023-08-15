@@ -1,15 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { IUserWithoutPass } from './types/user.types';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @Inject(forwardRef(() => AuthService))
+    private readonly authService: AuthService,
   ) {}
 
   async signUp(newUser: CreateUserDto): Promise<IUserWithoutPass> {
@@ -33,11 +42,32 @@ export class UserService {
     return user;
   }
 
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
+  async update(user: UpdateUserDto): Promise<string | object> {
+    const validUser = await this.authService.validateUser(
+      user.username,
+      user.password,
+    );
+    if (validUser) {
+      const salt = 10;
+      const hashedPassword = await bcrypt.hash(user.newPassword, salt);
+      validUser.password = hashedPassword;
+      await this.userRepository.update(validUser.id, validUser);
+      return `User with username = ${user.username} has been updated`;
+    } else {
+      return new ConflictException('Wrong password or username').getResponse();
+    }
+  }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} user`;
-  // }
+  async remove(id: number): Promise<User> {
+    const userToDelete = await this.userRepository.findOne({
+      where: { id },
+      relations: ['dashboards'],
+    });
+    return userToDelete;
+    // if (deletedUser) {
+    //   return `User has been deleted`;
+    // } else {
+    //   return new ConflictException('Wrong id of user').getResponse();
+    // }
+  }
 }

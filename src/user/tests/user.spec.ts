@@ -4,13 +4,9 @@ import { UserService } from '../user.service';
 import { Test } from '@nestjs/testing';
 import { TestDatabaseConfig } from '../../configs/test.database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
-
-const TestingModule = Test.createTestingModule({
-  imports: [TestDatabaseConfig, TypeOrmModule.forFeature([User])],
-  providers: [UserService],
-  controllers: [UserController],
-}).compile();
+import { clearDatabase } from '../../utils/utils';
+import { AuthService } from '../../auth/auth.service';
+import { JwtService } from '@nestjs/jwt';
 
 describe('UserController', () => {
   let service: UserService;
@@ -22,8 +18,15 @@ describe('UserController', () => {
   };
 
   beforeAll(async () => {
-    service = (await TestingModule).get<UserService>(UserService);
-    controller = (await TestingModule).get<UserController>(UserController);
+    const TestingModule = await Test.createTestingModule({
+      imports: [TestDatabaseConfig, TypeOrmModule.forFeature([User])],
+      providers: [UserService, AuthService, JwtService],
+      controllers: [UserController],
+    }).compile();
+
+    service = TestingModule.get<UserService>(UserService);
+    controller = TestingModule.get<UserController>(UserController);
+    clearDatabase(TestingModule);
   });
 
   it('should resigter user', async () => {
@@ -47,10 +50,5 @@ describe('UserController', () => {
         `User with login = ${newUser.username} already exists`,
       );
     }
-  });
-
-  afterAll(async () => {
-    const dataSource = (await TestingModule).get(DataSource);
-    await dataSource.createQueryBuilder().delete().from(User).execute();
   });
 });

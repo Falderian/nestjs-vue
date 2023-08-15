@@ -12,11 +12,13 @@ import { Dashboard } from '../dashboards/entities/dashboard.entity';
 
 @Module({
   imports: [
+    AuthModule,
     UserModule,
     DashboardsModule,
     TypeOrmModule.forFeature([User, Card, Dashboard]),
   ],
   controllers: [CardsController],
-  providers: [CardsService, AuthModule, JwtService],
+  providers: [CardsService, JwtService],
+  exports: [CardsService],
 })
 export class CardsModule {}

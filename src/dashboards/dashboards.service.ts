@@ -11,6 +11,8 @@ import { UserService } from '../user/user.service';
 import { Dashboard } from './entities/dashboard.entity';
 import { IDashboadCards } from './types/dashboards.types';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
+import { Inject } from '@nestjs/common';
+import { Card } from '../cards/entities/card.entity';
 
 @Injectable()
 export class DashboardsService {
@@ -18,6 +20,8 @@ export class DashboardsService {
     @InjectRepository(Dashboard)
     private dashboardsRepository: Repository<Dashboard>,
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Card) private cardsRepository: Repository<Card>,
+    @Inject(UserService)
     private readonly userService: UserService,
   ) {}
 
@@ -49,10 +53,10 @@ export class DashboardsService {
     }
   }
 
-  async getUsersDashboards(userId: string): Promise<Dashboard[]> {
+  async getUsersDashboards(id: number): Promise<Dashboard[]> {
     const user = await this.usersRepository.findOne({
       relations: ['dashboards'],
-      where: { id: +userId },
+      where: { id },
     });
     const dashboards = user.dashboards.map(async (dashboard) => {
       const dashboardsCards = this.dashboardsRepository.findOne({
@@ -64,10 +68,10 @@ export class DashboardsService {
     return await Promise.all(dashboards);
   }
 
-  async getDashboardsCards(dashboardId: string): Promise<IDashboadCards> {
+  async getDashboardsCards(dashboardId: number): Promise<IDashboadCards> {
     const dashboard = await this.dashboardsRepository.findOne({
       relations: ['cards'],
-      where: { id: +dashboardId },
+      where: { id: dashboardId },
     });
 
     if (!dashboard)
@@ -96,12 +100,25 @@ export class DashboardsService {
   }
 
   async delete(dashboardId: number): Promise<string> {
-    await this.dashboardsRepository.delete(dashboardId);
-    return `Dashboard with id = ${dashboardId} has beed deleted`;
+    try {
+      const dashboardToDelete = await this.find(dashboardId);
+      if (dashboardToDelete.cards.length) {
+        dashboardToDelete.cards.forEach(
+          async (card) => await this.cardsRepository.delete(card),
+        );
+      }
+      await this.dashboardsRepository.delete(dashboardId);
+      return `Dashboard with id = ${dashboardId} has beed deleted`;
+    } catch (error) {
+      return error;
+    }
   }
 
   async find(id: number): Promise<Dashboard> {
-    const dashboard = await this.dashboardsRepository.findOneBy({ id });
+    const dashboard = await this.dashboardsRepository.findOne({
+      where: { id },
+      relations: ['cards'],
+    });
     return dashboard;
   }
 }

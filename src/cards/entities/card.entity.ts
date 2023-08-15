@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+} from 'typeorm';
 import { Dashboard } from '../../dashboards/entities/dashboard.entity';
 @Entity()
 export class Card {
@@ -16,7 +22,6 @@ export class Card {
 
   @ManyToOne(() => Dashboard, (dashboard) => dashboard.cards, {
     nullable: false,
-    cascade: true,
   })
-  dashboard: Dashboard;
+  dashboard: Relation<Dashboard>;
 }
