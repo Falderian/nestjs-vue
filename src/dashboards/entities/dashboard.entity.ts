@@ -17,9 +17,13 @@ export class Dashboard {
   @Column({ type: 'varchar', length: 20, unique: true })
   title: string;
 
-  @ManyToOne(() => User, (user) => user.dashboards)
+  @ManyToOne(() => User, (user) => user.dashboards, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 
-  @OneToMany(() => Card, (card) => card.dashboard, { cascade: true })
+  @OneToMany(() => Card, (card) => card.dashboard, {
+    cascade: true,
+  })
   cards: Relation<Card[]>;
 }

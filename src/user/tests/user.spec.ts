@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { clearDatabase } from '../../utils/utils';
 import { AuthService } from '../../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { after } from 'node:test';
 
 describe('UserController', () => {
   let service: UserService;
@@ -17,16 +18,21 @@ describe('UserController', () => {
     password: (Math.random() * 100000).toFixed(),
   };
 
-  beforeAll(async () => {
-    const TestingModule = await Test.createTestingModule({
+  async function CreateTestingModule() {
+    return await Test.createTestingModule({
       imports: [TestDatabaseConfig, TypeOrmModule.forFeature([User])],
       providers: [UserService, AuthService, JwtService],
       controllers: [UserController],
     }).compile();
+  }
 
-    service = TestingModule.get<UserService>(UserService);
-    controller = TestingModule.get<UserController>(UserController);
-    clearDatabase(TestingModule);
+  const testingModule = CreateTestingModule();
+
+  beforeAll(async () => {
+    const module = await testingModule;
+    service = module.get<UserService>(UserService);
+    controller = module.get<UserController>(UserController);
+    clearDatabase(module);
   });
 
   it('should resigter user', async () => {
@@ -51,4 +57,6 @@ describe('UserController', () => {
       );
     }
   });
+
+  afterAll(async () => (await testingModule).close());
 });

@@ -14,11 +14,13 @@ import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { IDashboadCards } from './types/dashboards.types';
 import { Dashboard } from './entities/dashboard.entity';
-// import { InjectRepository } from '@nestjs/typeorm';
-// import { Repository } from 'typeorm';
 
+// Uncomment to fill DB
 // import { CardsService } from '../cards/cards.service';
 // import { User } from '../user/entities/user.entity';
+// import { UserService } from '../user/user.service';
+// import { InjectRepository } from '@nestjs/typeorm';
+// import { Repository } from 'typeorm';
 
 @UseGuards(AuthJwtGuards)
 @Controller('dashboards')
@@ -26,9 +28,8 @@ export class DashboardsController {
   constructor(
     // @InjectRepository(User)
     // private UserRepository: Repository<User>,
+    // private readonly userService: UserService,
     // private readonly cardsService: CardsService,
-    // @InjectRepository(Dashboard)
-    // private dashboardsRepository: Repository<Dashboard>,
     private readonly dashboardsService: DashboardsService,
   ) {}
 
@@ -59,15 +60,17 @@ export class DashboardsController {
     return this.dashboardsService.delete(id);
   }
 
-  // Uncomment to fill DB
   // @Get()
   // async fill() {
+  //   // fill users
   //   for (let i = 0; i <= 50; i++) {
-  //     this.UserRepository.save({
+  //     this.userService.signUp({
   //       username: `test${i}`,
-  //       password: 'test',
+  //       password: 'testtest',
   //     });
   //   }
+
+  //   // fill dashboards
   //   const users = await this.UserRepository.find();
   //   users.forEach(async (user) => {
   //     for (let i = 0; i <= 10; i++) {
@@ -77,6 +80,8 @@ export class DashboardsController {
   //       });
   //     }
   //   });
+
+  //   // fill cards
   //   const dashboards = await this.dashboardsRepository.find({
   //     relations: ['user'],
   //   });
