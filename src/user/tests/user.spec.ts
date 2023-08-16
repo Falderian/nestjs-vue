@@ -1,13 +1,12 @@
 import { User } from '../entities/user.entity';
 import { UserController } from '../user.controller';
 import { UserService } from '../user.service';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TestDatabaseConfig } from '../../configs/test.database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { clearDatabase } from '../../utils/utils';
 import { AuthService } from '../../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
-import { after } from 'node:test';
 
 describe('UserController', () => {
   let service: UserService;
@@ -18,7 +17,7 @@ describe('UserController', () => {
     password: (Math.random() * 100000).toFixed(),
   };
 
-  async function CreateTestingModule() {
+  async function CreateTestingModule(): Promise<TestingModule> {
     return await Test.createTestingModule({
       imports: [TestDatabaseConfig, TypeOrmModule.forFeature([User])],
       providers: [UserService, AuthService, JwtService],

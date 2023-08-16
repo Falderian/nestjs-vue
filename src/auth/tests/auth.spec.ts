@@ -1,4 +1,4 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TestDatabaseConfig } from '../../configs/test.database.config';
 import { AuthService } from '../auth.service';
 import { AuthController } from '../auth.controller';
@@ -12,7 +12,7 @@ describe('AuthController', () => {
   let authController: AuthController;
   let userController: UserController;
 
-  async function CreateTestingModule() {
+  async function CreateTestingModule(): Promise<TestingModule> {
     return await Test.createTestingModule({
       imports: [TestDatabaseConfig, UserModule, JWTModule],
       providers: [AuthService],
