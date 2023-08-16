@@ -2,6 +2,7 @@ import {
   Injectable,
   NotAcceptableException,
   NotFoundException,
+  forwardRef,
 } from '@nestjs/common';
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -12,7 +13,6 @@ import { Dashboard } from './entities/dashboard.entity';
 import { IDashboadCards } from './types/dashboards.types';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { Inject } from '@nestjs/common';
-import { Card } from '../cards/entities/card.entity';
 
 @Injectable()
 export class DashboardsService {
@@ -20,8 +20,7 @@ export class DashboardsService {
     @InjectRepository(Dashboard)
     private dashboardsRepository: Repository<Dashboard>,
     @InjectRepository(User) private usersRepository: Repository<User>,
-    @InjectRepository(Card) private cardsRepository: Repository<Card>,
-    @Inject(UserService)
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {}
 
@@ -99,26 +98,20 @@ export class DashboardsService {
     return updatedDashboard;
   }
 
-  async delete(dashboardId: number): Promise<string> {
-    try {
-      const dashboardToDelete = await this.find(dashboardId);
-      if (dashboardToDelete.cards.length) {
-        dashboardToDelete.cards.forEach(
-          async (card) => await this.cardsRepository.delete(card),
-        );
-      }
-      await this.dashboardsRepository.delete(dashboardId);
-      return `Dashboard with id = ${dashboardId} has beed deleted`;
-    } catch (error) {
-      return error;
-    }
-  }
-
   async find(id: number): Promise<Dashboard> {
     const dashboard = await this.dashboardsRepository.findOne({
       where: { id },
       relations: ['cards'],
     });
     return dashboard;
+  }
+
+  async delete(dashboardId: number): Promise<string> {
+    try {
+      await this.dashboardsRepository.delete(dashboardId);
+      return `Dashboard with id = ${dashboardId} has beed deleted`;
+    } catch (error) {
+      return error;
+    }
   }
 }

@@ -12,17 +12,22 @@ describe('AuthController', () => {
   let authController: AuthController;
   let userController: UserController;
 
-  beforeAll(async () => {
-    const TestingModule = await Test.createTestingModule({
+  async function CreateTestingModule() {
+    return await Test.createTestingModule({
       imports: [TestDatabaseConfig, UserModule, JWTModule],
       providers: [AuthService],
       controllers: [AuthController],
     }).compile();
+  }
 
-    authService = TestingModule.get<AuthService>(AuthService);
-    authController = TestingModule.get<AuthController>(AuthController);
-    userController = TestingModule.get<UserController>(UserController);
-    clearDatabase(TestingModule);
+  const testingModule = CreateTestingModule();
+
+  beforeAll(async () => {
+    const module = await testingModule;
+    authService = module.get<AuthService>(AuthService);
+    authController = module.get<AuthController>(AuthController);
+    userController = module.get<UserController>(UserController);
+    clearDatabase(module);
   });
 
   it('should be defined', () => {
@@ -42,4 +47,6 @@ describe('AuthController', () => {
     const loginUser = await authController.login(user);
     expect(registeredUser.id).toEqual(loginUser.userId);
   });
+
+  afterAll(async () => (await testingModule).close());
 });

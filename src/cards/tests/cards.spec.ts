@@ -6,7 +6,6 @@ import { clearDatabase } from '../../utils/utils';
 import { CardsController } from '../cards.controller';
 import { Dashboard } from '../../dashboards/entities/dashboard.entity';
 
-import { IAuthorizedUser } from '../../../dist/auth/types/auth.types';
 import { CardsService } from '../cards.service';
 import { AuthService } from '../../auth/auth.service';
 import { UserService } from '../../user/user.service';
@@ -15,6 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Card } from '../entities/card.entity';
 import { UserModule } from '../../user/user.module';
 import { ConflictException } from '@nestjs/common';
+import { IAuthorizedUser } from '../../../dist/auth/types/auth.types';
 
 describe('Cards Module', () => {
   let userService: UserService;
@@ -26,8 +26,8 @@ describe('Cards Module', () => {
   let dashboard: Dashboard;
   let card: Card;
 
-  beforeAll(async () => {
-    const TestingModule = await Test.createTestingModule({
+  async function CreateTestingModule() {
+    return await Test.createTestingModule({
       imports: [
         TestDatabaseConfig,
         JWTModule,
@@ -38,13 +38,17 @@ describe('Cards Module', () => {
       providers: [CardsService, AuthService],
       controllers: [CardsController],
     }).compile();
+  }
 
-    cardsService = TestingModule.get<CardsService>(CardsService);
-    userService = TestingModule.get<UserService>(UserService);
-    authService = TestingModule.get<AuthService>(AuthService);
-    dashboardService = TestingModule.get<DashboardsService>(DashboardsService);
+  const testingModule = CreateTestingModule();
 
-    await clearDatabase(TestingModule);
+  beforeAll(async () => {
+    const module = await testingModule;
+    cardsService = module.get<CardsService>(CardsService);
+    userService = module.get<UserService>(UserService);
+    authService = module.get<AuthService>(AuthService);
+    dashboardService = module.get<DashboardsService>(DashboardsService);
+    clearDatabase(module);
   });
 
   it('should register, login user and return an access token', async () => {
@@ -119,4 +123,6 @@ describe('Cards Module', () => {
     const deletedCard = await cardsService.delete(card.id);
     expect(deletedCard).toBe(`Card with id = ${card.id} has beed deleted`);
   });
+
+  afterAll(async () => (await testingModule).close());
 });

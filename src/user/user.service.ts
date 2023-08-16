@@ -12,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { IUserWithoutPass } from './types/user.types';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthService } from '../auth/auth.service';
+import { DashboardsService } from '../dashboards/dashboards.service';
 
 @Injectable()
 export class UserService {
@@ -58,16 +59,12 @@ export class UserService {
     }
   }
 
-  async remove(id: number): Promise<User> {
-    const userToDelete = await this.userRepository.findOne({
-      where: { id },
-      relations: ['dashboards'],
-    });
-    return userToDelete;
-    // if (deletedUser) {
-    //   return `User has been deleted`;
-    // } else {
-    //   return new ConflictException('Wrong id of user').getResponse();
-    // }
+  async remove(id: number): Promise<any> {
+    try {
+      this.userRepository.delete(id);
+      return `User has been deleted`;
+    } catch (error) {
+      console.log(error);
+    }
   }
 }

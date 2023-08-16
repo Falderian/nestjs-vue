@@ -12,7 +12,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, unique: true })
   username: string;
 
   @Column({ type: 'varchar' })
@@ -21,7 +21,9 @@ export class User {
   @Column({ type: 'varchar', length: 30, default: 'user' })
   role: string;
 
-  @OneToMany(() => Dashboard, (dashboard) => dashboard.user, { cascade: true })
+  @OneToMany(() => Dashboard, (dashboard) => dashboard.user, {
+    cascade: true,
+  })
   @JoinColumn({ name: 'dashboards' })
   dashboards: Dashboard[];
 }

@@ -1,15 +1,15 @@
 import { Test } from '@nestjs/testing';
 import { TestDatabaseConfig } from '../../configs/test.database.config';
 import { UserModule } from '../../user/user.module';
-import { JWTModule } from '../../configs/jwt.config';
 import { AuthService } from '../../auth/auth.service';
 import { AuthController } from '../../auth/auth.controller';
 import { UserController } from '../../user/user.controller';
 import { DashboardsModule } from '../dashboards.module';
 import { DashboardsController } from '../dashboards.controller';
-import { IAuthorizedUser } from '../../../dist/auth/types/auth.types';
 import { Dashboard } from '../entities/dashboard.entity';
 import { clearDatabase } from '../../utils/utils';
+import { JWTModule } from '../../configs/jwt.config';
+import { IAuthorizedUser } from '../../../dist/auth/types/auth.types';
 
 describe('Dashboard Module', () => {
   let authController: AuthController;
@@ -19,18 +19,23 @@ describe('Dashboard Module', () => {
   let loggedUser: IAuthorizedUser;
   let dashboard: Dashboard;
 
-  beforeAll(async () => {
-    const TestingModule = await Test.createTestingModule({
+  async function CreateTestingModule() {
+    return await Test.createTestingModule({
       imports: [TestDatabaseConfig, UserModule, JWTModule, DashboardsModule],
       providers: [AuthService],
       controllers: [AuthController],
     }).compile();
+  }
 
-    authController = TestingModule.get<AuthController>(AuthController);
-    userController = TestingModule.get<UserController>(UserController);
+  const testingModule = CreateTestingModule();
+
+  beforeAll(async () => {
+    const module = await testingModule;
+    authController = module.get<AuthController>(AuthController);
+    userController = module.get<UserController>(UserController);
     dashboardController =
-      TestingModule.get<DashboardsController>(DashboardsController);
-    clearDatabase(TestingModule);
+      module.get<DashboardsController>(DashboardsController);
+    clearDatabase(module);
   });
 
   it('should register, login user and return an access token', async () => {
@@ -78,4 +83,6 @@ describe('Dashboard Module', () => {
     const res = await dashboardController.delete(dashboard.id);
     expect(res).toEqual(`Dashboard with id = ${dashboard.id} has beed deleted`);
   });
+
+  afterAll(async () => (await testingModule).close());
 });

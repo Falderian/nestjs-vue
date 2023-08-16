@@ -21,6 +21,7 @@ export class Card {
   status: string;
 
   @ManyToOne(() => Dashboard, (dashboard) => dashboard.cards, {
+    onDelete: 'CASCADE',
     nullable: false,
   })
   dashboard: Relation<Dashboard>;
