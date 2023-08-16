@@ -1,4 +1,4 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TestDatabaseConfig } from '../../configs/test.database.config';
 import { UserModule } from '../../user/user.module';
 import { AuthService } from '../../auth/auth.service';
@@ -19,7 +19,7 @@ describe('Dashboard Module', () => {
   let loggedUser: IAuthorizedUser;
   let dashboard: Dashboard;
 
-  async function CreateTestingModule() {
+  async function CreateTestingModule(): Promise<TestingModule> {
     return await Test.createTestingModule({
       imports: [TestDatabaseConfig, UserModule, JWTModule, DashboardsModule],
       providers: [AuthService],

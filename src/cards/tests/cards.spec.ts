@@ -1,4 +1,4 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TestDatabaseConfig } from '../../configs/test.database.config';
 import { JWTModule } from '../../configs/jwt.config';
 import { CardsModule } from '../cards.module';
@@ -26,7 +26,7 @@ describe('Cards Module', () => {
   let dashboard: Dashboard;
   let card: Card;
 
-  async function CreateTestingModule() {
+  async function CreateTestingModule(): Promise<TestingModule> {
     return await Test.createTestingModule({
       imports: [
         TestDatabaseConfig,

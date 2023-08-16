@@ -12,7 +12,6 @@ import * as bcrypt from 'bcrypt';
 import { IUserWithoutPass } from './types/user.types';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthService } from '../auth/auth.service';
-import { DashboardsService } from '../dashboards/dashboards.service';
 
 @Injectable()
 export class UserService {
@@ -59,7 +58,7 @@ export class UserService {
     }
   }
 
-  async remove(id: number): Promise<any> {
+  async remove(id: number): Promise<string> {
     try {
       this.userRepository.delete(id);
       return `User has been deleted`;
