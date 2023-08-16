@@ -32,7 +32,7 @@ export class UserController {
 
   @UseGuards(AuthJwtGuards)
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<User> {
+  remove(@Param('id') id: string): Promise<string> {
     return this.userService.remove(+id);
   }
 }
