@@ -6,14 +6,12 @@ import {
   Delete,
   UseGuards,
   Param,
-  // Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { IUserWithoutPass } from './types/user.types';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthJwtGuards } from '../auth/guards/auth.guard';
-import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
