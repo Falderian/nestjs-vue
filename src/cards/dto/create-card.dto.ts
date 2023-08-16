@@ -1,12 +1,19 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, Validate } from 'class-validator';
+import { StatusValidator } from '../validation/status.validation';
 
 export class CreateCardDto {
   @IsNotEmpty()
   title: string;
 
   @IsNotEmpty()
-  description: string;
+  content: string;
+
+  @Validate(StatusValidator)
+  status: string;
 
   @IsNotEmpty()
-  user: string;
+  dashboardId: number;
+
+  @IsNotEmpty()
+  userId: number;
 }

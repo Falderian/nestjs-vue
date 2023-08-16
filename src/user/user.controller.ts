@@ -1,32 +1,38 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
   Patch,
-  Param,
   Delete,
+  UseGuards,
+  Param,
+  // Get,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { IUserWithoutPass } from './types/user.types';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthJwtGuards } from '../auth/guards/auth.guard';
+import { User } from './entities/user.entity';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('signup')
-  signUp(@Body() user: CreateUserDto) {
+  signUp(@Body() user: CreateUserDto): Promise<IUserWithoutPass> {
     return this.userService.signUp(user);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @UseGuards(AuthJwtGuards)
+  @Patch()
+  update(@Body() updateUserDto: UpdateUserDto): Promise<string | object> {
+    return this.userService.update(updateUserDto);
   }
 
+  @UseGuards(AuthJwtGuards)
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): Promise<User> {
     return this.userService.remove(+id);
   }
 }

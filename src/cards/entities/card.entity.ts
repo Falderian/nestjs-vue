@@ -1,6 +1,11 @@
-import { User } from 'src/user/entities/user.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+} from 'typeorm';
+import { Dashboard } from '../../dashboards/entities/dashboard.entity';
 @Entity()
 export class Card {
   @PrimaryGeneratedColumn()
@@ -12,6 +17,12 @@ export class Card {
   @Column({ type: 'varchar' })
   content: string;
 
-  @OneToMany(() => User, (user) => user.cards)
-  user: User;
+  @Column({ type: 'varchar', length: 20 })
+  status: string;
+
+  @ManyToOne(() => Dashboard, (dashboard) => dashboard.cards, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
+  dashboard: Relation<Dashboard>;
 }

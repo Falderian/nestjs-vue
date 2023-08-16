@@ -1,12 +1,18 @@
-import { Card } from 'src/cards/entities/card.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Dashboard } from '../../dashboards/entities/dashboard.entity';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, unique: true })
   username: string;
 
   @Column({ type: 'varchar' })
@@ -15,6 +21,9 @@ export class User {
   @Column({ type: 'varchar', length: 30, default: 'user' })
   role: string;
 
-  @OneToMany(() => Card, (card) => card.user, { nullable: true })
-  cards: Card[];
+  @OneToMany(() => Dashboard, (dashboard) => dashboard.user, {
+    cascade: true,
+  })
+  @JoinColumn({ name: 'dashboards' })
+  dashboards: Dashboard[];
 }

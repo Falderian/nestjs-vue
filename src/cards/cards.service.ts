@@ -1,36 +1,75 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateCardDto } from './dto/create-card.dto';
-import { UpdateCardDto } from './dto/update-card.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
-import { UserService } from 'src/user/user.service';
+import { Card } from './entities/card.entity';
+import { Dashboard } from '../dashboards/entities/dashboard.entity';
+import { UpdateCardDto } from './dto/update-card.dto';
 
 @Injectable()
 export class CardsService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-    private readonly userService: UserService,
+    @InjectRepository(Card) private cardsRepository: Repository<Card>,
+    @InjectRepository(Dashboard)
+    private dashboardsRepository: Repository<Dashboard>,
   ) {}
 
-  async create(createCardDto: CreateCardDto) {
-    const user = await this.userService.findUser(createCardDto.user);
-    return user;
+  async create(createCardDto: CreateCardDto): Promise<Card> {
+    const dashboard = await this.dashboardsRepository.findOne({
+      relations: ['cards', 'user'],
+      where: {
+        user: { id: +createCardDto.userId },
+        id: +createCardDto.dashboardId,
+      },
+    });
+
+    const isCardAlreadyExists = dashboard.cards.find(
+      (card) => card.title === createCardDto.title,
+    );
+
+    if (isCardAlreadyExists)
+      throw new ConflictException(
+        `Card with title = ${createCardDto.title} is already exists on dashboard with title = ${dashboard.title}`,
+      );
+
+    delete createCardDto.dashboardId;
+    delete dashboard.user;
+
+    const newCard = await this.cardsRepository.save({
+      ...createCardDto,
+      dashboard,
+    });
+
+    delete newCard.dashboard;
+    return newCard;
   }
 
-  findAll() {
-    return `This action returns all cards`;
+  async find(id: number): Promise<Card> {
+    const findedCard = await this.cardsRepository.findOneBy({
+      id,
+    });
+    return findedCard;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} card`;
+  async update(updateCardDto: UpdateCardDto): Promise<string> {
+    const card = await this.cardsRepository.findOneBy({
+      id: updateCardDto.id,
+    });
+
+    try {
+      await this.cardsRepository.update(card.id, updateCardDto);
+      return `Card with id = ${updateCardDto.id} has beed updated`;
+    } catch (error) {
+      return error;
+    }
   }
 
-  update(id: number, updateCardDto: UpdateCardDto) {
-    return `This action updates a #${id} card`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} card`;
+  async delete(id: number): Promise<string> {
+    try {
+      await this.cardsRepository.delete(id);
+      return `Card with id = ${id} has beed deleted`;
+    } catch (error) {
+      return error;
+    }
   }
 }
