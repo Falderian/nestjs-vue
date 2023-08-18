@@ -22,13 +22,19 @@ export class UserService {
   ) {}
 
   async signUp(newUser: CreateUserDto): Promise<IUserWithoutPass> {
-    const salt = 10;
-    const hashedPassword = await bcrypt.hash(newUser.password, salt);
-    newUser.password = hashedPassword;
+    try {
+      const salt = 10;
+      const hashedPassword = await bcrypt.hash(newUser.password, salt);
+      newUser.password = hashedPassword;
 
-    const user = await this.userRepository.save(newUser);
-    delete user.password;
-    return user;
+      const user = await this.userRepository.save(newUser);
+      delete user.password;
+      return user;
+    } catch (error) {
+      throw new ConflictException(
+        `User with username = ${newUser.username} is already exists`,
+      );
+    }
   }
 
   async findUser(param: string | number): Promise<User> {
