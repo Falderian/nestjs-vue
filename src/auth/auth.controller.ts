@@ -11,4 +11,9 @@ export class AuthController {
   async login(@Body() user: CreateUserDto): Promise<IAuthorizedUser> {
     return this.authService.login(user);
   }
+
+  @Post('token')
+  async validateToken(@Body() payload: { token: string }): Promise<boolean> {
+    return this.authService.validateToken(payload.token);
+  }
 }

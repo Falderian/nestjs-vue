@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotAcceptableException,
+  UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -11,6 +12,7 @@ import { IAuthorizedUser } from './types/auth.types';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Inject } from '@nestjs/common';
+import { secret } from 'src/configs/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -42,5 +44,14 @@ export class AuthService {
       userId: findedUser.id,
       access_token: this.jwtService.sign(payload),
     };
+  }
+
+  async validateToken(token: string): Promise<boolean> {
+    try {
+      const payload = await this.jwtService.verifyAsync(token, { secret });
+      return payload;
+    } catch (error) {
+      throw new UnauthorizedException(error);
+    }
   }
 }
