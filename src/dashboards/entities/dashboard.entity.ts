@@ -44,10 +44,4 @@ export class Dashboard {
     cascade: true,
   })
   cards: Relation<Card[]>;
-  dashboard: {
-    toDo: any[];
-    inProgress: any[];
-    review: any[];
-    completed: any[];
-  };
 }

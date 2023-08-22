@@ -10,7 +10,7 @@ import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { Dashboard } from './entities/dashboard.entity';
-import { IDashboadCards } from './types/dashboards.types';
+import { IDashboadCards, IDashboardsWithCards } from './types/dashboards.types';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { Inject } from '@nestjs/common';
 
@@ -67,7 +67,7 @@ export class DashboardsService {
     return await Promise.all(dashboards);
   }
 
-  async getDashboard(dashboardId: number): Promise<Dashboard> {
+  async getDashboard(dashboardId: number): Promise<IDashboardsWithCards> {
     const dashboard = await this.dashboardsRepository.findOne({
       relations: ['cards'],
       where: { id: dashboardId },
@@ -88,9 +88,13 @@ export class DashboardsService {
     dashboard.cards.forEach((card) =>
       cards[card.status].push(dashboard.cards.find((el) => el.id === card.id)),
     );
-    console.log(cards);
-
-    return { ...dashboard };
+    const dashboardWithCards = {
+      ...dashboard,
+      cards,
+      tasksCount: dashboard.cards.length,
+    };
+    console.log(dashboardWithCards);
+    return dashboardWithCards;
   }
 
   async update(dashboard: UpdateDashboardDto): Promise<Dashboard> {

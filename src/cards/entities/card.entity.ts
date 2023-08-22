@@ -22,6 +22,9 @@ export class Card {
   @Column({ type: 'varchar', length: 20 })
   status: string;
 
+  @Column({ type: 'varchar', default: 'low' })
+  priority: string;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
