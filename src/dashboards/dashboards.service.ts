@@ -67,7 +67,7 @@ export class DashboardsService {
     return await Promise.all(dashboards);
   }
 
-  async getDashboardsCards(dashboardId: number): Promise<IDashboadCards> {
+  async getDashboard(dashboardId: number): Promise<Dashboard> {
     const dashboard = await this.dashboardsRepository.findOne({
       relations: ['cards'],
       where: { id: dashboardId },
@@ -85,9 +85,12 @@ export class DashboardsService {
       completed: [],
     };
 
-    dashboard.cards.forEach((card) => cards[card.status].push(card));
+    dashboard.cards.forEach((card) =>
+      cards[card.status].push(dashboard.cards.find((el) => el.id === card.id)),
+    );
+    console.log(cards);
 
-    return cards;
+    return { ...dashboard };
   }
 
   async update(dashboard: UpdateDashboardDto): Promise<Dashboard> {

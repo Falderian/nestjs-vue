@@ -48,8 +48,8 @@ export class AuthService {
 
   async validateToken(token: string): Promise<boolean> {
     try {
-      const payload = await this.jwtService.verifyAsync(token, { secret });
-      return payload;
+      await this.jwtService.verifyAsync(token, { secret });
+      return true;
     } catch (error) {
       throw new UnauthorizedException(error);
     }

@@ -19,6 +19,9 @@ export class Dashboard {
   @Column({ type: 'varchar', length: 20, unique: true })
   title: string;
 
+  @Column({ type: 'varchar', default: 'No description' })
+  description: string;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',
@@ -41,4 +44,10 @@ export class Dashboard {
     cascade: true,
   })
   cards: Relation<Card[]>;
+  dashboard: {
+    toDo: any[];
+    inProgress: any[];
+    review: any[];
+    completed: any[];
+  };
 }

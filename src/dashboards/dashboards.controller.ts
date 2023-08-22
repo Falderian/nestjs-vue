@@ -44,10 +44,8 @@ export class DashboardsController {
   }
 
   @Get(':id/cards')
-  getDashboardsCards(
-    @Param('id') dashboardId: string,
-  ): Promise<IDashboadCards> {
-    return this.dashboardsService.getDashboardsCards(+dashboardId);
+  getDashboard(@Param('id') dashboardId: string): Promise<Dashboard> {
+    return this.dashboardsService.getDashboard(+dashboardId);
   }
 
   @Put()
