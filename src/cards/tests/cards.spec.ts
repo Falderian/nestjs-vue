@@ -14,7 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Card } from '../entities/card.entity';
 import { UserModule } from '../../user/user.module';
 import { ConflictException } from '@nestjs/common';
-import { IAuthorizedUser } from '../../../dist/auth/types/auth.types';
+import { IAuthorizedUser } from '../../auth/types/auth.types';
 
 describe('Cards Module', () => {
   let userService: UserService;

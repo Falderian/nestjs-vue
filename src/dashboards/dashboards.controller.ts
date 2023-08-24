@@ -12,7 +12,7 @@ import { DashboardsService } from './dashboards.service';
 import { AuthJwtGuards } from '../auth/guards/auth.guard';
 import { CreateDashboardDto } from './dto/create-dashboard.dto';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
-import { IDashboadCards } from './types/dashboards.types';
+import { IDashboadCards, IDashboardsWithCards } from './types/dashboards.types';
 import { Dashboard } from './entities/dashboard.entity';
 
 // Uncomment to fill DB
@@ -44,10 +44,10 @@ export class DashboardsController {
   }
 
   @Get(':id/cards')
-  getDashboardsCards(
+  getDashboard(
     @Param('id') dashboardId: string,
-  ): Promise<IDashboadCards> {
-    return this.dashboardsService.getDashboardsCards(+dashboardId);
+  ): Promise<IDashboardsWithCards> {
+    return this.dashboardsService.getDashboard(+dashboardId);
   }
 
   @Put()

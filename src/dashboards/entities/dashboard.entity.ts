@@ -19,6 +19,9 @@ export class Dashboard {
   @Column({ type: 'varchar', length: 20, unique: true })
   title: string;
 
+  @Column({ type: 'varchar', default: 'No description', nullable: true })
+  description: string;
+
   @CreateDateColumn({
     type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP(6)',

@@ -7,4 +7,6 @@ export class UpdateDashboardDto {
   @IsNotEmpty()
   @MinLength(3)
   title: string;
+
+  description?: string;
 }

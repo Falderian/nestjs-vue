@@ -10,7 +10,7 @@ import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { Dashboard } from './entities/dashboard.entity';
-import { IDashboadCards } from './types/dashboards.types';
+import { IDashboadCards, IDashboardsWithCards } from './types/dashboards.types';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { Inject } from '@nestjs/common';
 
@@ -57,17 +57,10 @@ export class DashboardsService {
       relations: ['dashboards'],
       where: { id },
     });
-    const dashboards = user.dashboards.map(async (dashboard) => {
-      const dashboardsCards = this.dashboardsRepository.findOne({
-        relations: ['cards'],
-        where: { id: dashboard.id },
-      });
-      return dashboardsCards;
-    });
-    return await Promise.all(dashboards);
+    return user.dashboards;
   }
 
-  async getDashboardsCards(dashboardId: number): Promise<IDashboadCards> {
+  async getDashboard(dashboardId: number): Promise<IDashboardsWithCards> {
     const dashboard = await this.dashboardsRepository.findOne({
       relations: ['cards'],
       where: { id: dashboardId },
@@ -85,9 +78,15 @@ export class DashboardsService {
       completed: [],
     };
 
-    dashboard.cards.forEach((card) => cards[card.status].push(card));
-
-    return cards;
+    dashboard.cards.forEach((card) =>
+      cards[card.status].push(dashboard.cards.find((el) => el.id === card.id)),
+    );
+    const dashboardWithCards = {
+      ...dashboard,
+      cards,
+      tasksCount: dashboard.cards.length,
+    };
+    return dashboardWithCards;
   }
 
   async update(dashboard: UpdateDashboardDto): Promise<Dashboard> {

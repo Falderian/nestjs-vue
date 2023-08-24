@@ -40,9 +40,18 @@ export class UserService {
   async findUser(param: string | number): Promise<User> {
     let user = new User();
     if (typeof param == 'string') {
-      user = await this.userRepository.findOneBy({ username: param });
+      user = await this.userRepository.findOne({
+        where: { username: param },
+        select: {
+          password: true,
+          id: true,
+          username: true,
+        },
+      });
     } else {
-      user = await this.userRepository.findOneBy({ id: param });
+      user = await this.userRepository.findOne({
+        where: { id: param },
+      });
     }
 
     return user;
@@ -69,7 +78,7 @@ export class UserService {
       this.userRepository.delete(id);
       return `User has been deleted`;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 }

@@ -1,5 +1,6 @@
 import { IsNotEmpty, Validate } from 'class-validator';
 import { StatusValidator } from '../validation/status.validation';
+import { priorityValidator } from '../validation/priority.validation';
 
 export class CreateCardDto {
   @IsNotEmpty()
@@ -14,6 +15,7 @@ export class CreateCardDto {
   @IsNotEmpty()
   dashboardId: number;
 
+  @Validate(priorityValidator)
   @IsNotEmpty()
-  userId: number;
+  priority: string;
 }

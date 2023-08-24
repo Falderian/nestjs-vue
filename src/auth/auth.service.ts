@@ -12,7 +12,7 @@ import { IAuthorizedUser } from './types/auth.types';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Inject } from '@nestjs/common';
-import { secret } from 'src/configs/jwt.config';
+import { secret } from '../configs/jwt.config';
 
 @Injectable()
 export class AuthService {
@@ -27,9 +27,7 @@ export class AuthService {
     if (!user) {
       throw new NotAcceptableException('could not find the user');
     }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (user && isPasswordValid) {
       return user;
     }
@@ -46,10 +44,12 @@ export class AuthService {
     };
   }
 
-  async validateToken(token: string): Promise<boolean> {
+  async validateToken(token: string): Promise<User> {
     try {
-      const payload = await this.jwtService.verifyAsync(token, { secret });
-      return payload;
+      const unhashedUser = await this.jwtService.verifyAsync(token, { secret });
+      const user = await this.userService.findUser(unhashedUser.username);
+      delete user.password;
+      return user;
     } catch (error) {
       throw new UnauthorizedException(error);
     }

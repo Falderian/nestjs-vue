@@ -10,7 +10,7 @@ const DEV = TypeOrmModule.forRoot({
   port: +process.env.POSTGRES_PORT,
   password: process.env.PASSWORD,
   username: process.env.USER,
-  database: 'nest-vue',
+  database: process.env.DATABASE,
   entities: [User, Card, Dashboard],
   autoLoadEntities: true,
   synchronize: true,
@@ -24,4 +24,5 @@ const PROD = TypeOrmModule.forRoot({
   url: 'postgres://mnxbfvxh:sRXcFP60CfP-5s7M118ucBdLVc4Kb4Ra@trumpet.db.elephantsql.com/mnxbfvxh',
 });
 
+console.log('ENVIROMENT MODE = ', process.env.ENV);
 export const DatabaseConfig = process.env.ENV === 'dev' ? DEV : PROD;
