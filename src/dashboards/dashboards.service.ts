@@ -57,14 +57,7 @@ export class DashboardsService {
       relations: ['dashboards'],
       where: { id },
     });
-    const dashboards = user.dashboards.map(async (dashboard) => {
-      const dashboardsCards = this.dashboardsRepository.findOne({
-        relations: ['cards'],
-        where: { id: dashboard.id },
-      });
-      return dashboardsCards;
-    });
-    return await Promise.all(dashboards);
+    return user.dashboards;
   }
 
   async getDashboard(dashboardId: number): Promise<IDashboardsWithCards> {
@@ -93,7 +86,6 @@ export class DashboardsService {
       cards,
       tasksCount: dashboard.cards.length,
     };
-    console.log(dashboardWithCards);
     return dashboardWithCards;
   }
 

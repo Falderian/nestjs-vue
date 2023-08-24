@@ -18,7 +18,6 @@ export class CardsService {
     const dashboard = await this.dashboardsRepository.findOne({
       relations: ['cards', 'user'],
       where: {
-        user: { id: +createCardDto.userId },
         id: +createCardDto.dashboardId,
       },
     });
