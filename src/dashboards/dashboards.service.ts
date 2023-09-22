@@ -1,6 +1,6 @@
 import {
+  ConflictException,
   Injectable,
-  NotAcceptableException,
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
@@ -46,7 +46,7 @@ export class DashboardsService {
       });
       return newDashboard;
     } catch (error) {
-      throw new NotAcceptableException(
+      throw new ConflictException(
         `Dashboard with title = ${dashboard.title}, is laready exists`,
       );
     }
