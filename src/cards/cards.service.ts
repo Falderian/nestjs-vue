@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Card } from './entities/card.entity';
 import { Dashboard } from '../dashboards/entities/dashboard.entity';
 import { UpdateCardDto } from './dto/update-card.dto';
+import { updateDashboardDateUpd } from '../dashboards/helpers/dashboards.helper';
 
 @Injectable()
 export class CardsService {
