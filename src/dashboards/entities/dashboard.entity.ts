@@ -41,7 +41,7 @@ export class Dashboard {
   user: User;
 
   @OneToMany(() => Card, (card) => card.dashboard, {
-    cascade: true,
+    onDelete: 'CASCADE',
   })
   cards: Relation<Card[]>;
 }

@@ -1,6 +1,6 @@
 import {
+  ConflictException,
   Injectable,
-  NotAcceptableException,
   NotFoundException,
   forwardRef,
 } from '@nestjs/common';
@@ -13,6 +13,7 @@ import { Dashboard } from './entities/dashboard.entity';
 import { IDashboadCards, IDashboardsWithCards } from './types/dashboards.types';
 import { UpdateDashboardDto } from './dto/update-dashboard.dto';
 import { Inject } from '@nestjs/common';
+import { sortCardsByPrior } from './helpers/dashboards.helper';
 
 @Injectable()
 export class DashboardsService {
@@ -46,7 +47,7 @@ export class DashboardsService {
       });
       return newDashboard;
     } catch (error) {
-      throw new NotAcceptableException(
+      throw new ConflictException(
         `Dashboard with title = ${dashboard.title}, is laready exists`,
       );
     }
@@ -81,6 +82,8 @@ export class DashboardsService {
     dashboard.cards.forEach((card) =>
       cards[card.status].push(dashboard.cards.find((el) => el.id === card.id)),
     );
+
+    sortCardsByPrior(cards);
     const dashboardWithCards = {
       ...dashboard,
       cards,

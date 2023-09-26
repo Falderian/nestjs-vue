@@ -11,6 +11,8 @@ export class UpdateCardDto extends PartialType(CreateCardDto) {
 
   content: string;
 
+  priority: string;
+
   @Validate(StatusValidator)
   status: string;
 }

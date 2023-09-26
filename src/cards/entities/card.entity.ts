@@ -40,7 +40,9 @@ export class Card {
 
   @ManyToOne(() => Dashboard, (dashboard) => dashboard.cards, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
     nullable: false,
+    cascade: true,
   })
   dashboard: Relation<Dashboard>;
 }
