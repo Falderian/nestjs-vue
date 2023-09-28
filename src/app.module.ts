@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { CardsModule } from './cards/cards.module';
 import { DashboardsModule } from './dashboards/dashboards.module';
+import { GoogleStrategy } from './googleAuth/google.strategy';
 
 @Module({
   imports: [
@@ -15,5 +16,6 @@ import { DashboardsModule } from './dashboards/dashboards.module';
     CardsModule,
     DashboardsModule,
   ],
+  providers: [GoogleStrategy],
 })
 export class AppModule {}

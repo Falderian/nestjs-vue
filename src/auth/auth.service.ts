@@ -8,11 +8,17 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from '../user/entities/user.entity';
-import { IAuthorizedUser } from './types/auth.types';
+import {
+  GoogleUser,
+  IAuthorizedUser,
+  IGoogleAuthorizedUser,
+} from './types/auth.types';
 import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { Inject } from '@nestjs/common';
 import { secret } from '../configs/jwt.config';
+import { Request } from 'express';
+import { IUserWithoutPass } from 'src/user/types/user.types';
 
 @Injectable()
 export class AuthService {
@@ -52,6 +58,38 @@ export class AuthService {
       return user;
     } catch (error) {
       throw new UnauthorizedException(error);
+    }
+  }
+
+  async googleLogin(
+    req: Request,
+  ): Promise<IGoogleAuthorizedUser | string | IUserWithoutPass> {
+    if (!req.user) {
+      return 'No user from google';
+    } else {
+      const user = req.user as GoogleUser;
+      const hashedPassword = await bcrypt.hash(user.email, 10);
+      const tempUser = {
+        username: user.email,
+        password: hashedPassword,
+      };
+      const findedUser = await this.userService.findUser(user.email);
+      console.log(hashedPassword);
+      if (!findedUser) {
+        const registration = await this.userService.signUp(tempUser);
+        return registration;
+      } else {
+        const loginUser = await this.login({
+          ...tempUser,
+          password: user.email,
+        });
+        console.log(loginUser);
+      }
+
+      return {
+        message: 'User information from google',
+        user: user as GoogleUser,
+      };
     }
   }
 }
